@@ -260,5 +260,5 @@ fabric.properties
 # mypy
 
 # Pyre type checker
-
+.idea
 # End of https://www.gitignore.io/api/flask,python,pycharm
