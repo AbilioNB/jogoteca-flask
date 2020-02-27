@@ -36,11 +36,12 @@ Observações:
 
 ### Para utilizar
 1. Clonar o projeto
-2. Instalar o Flask
+2. Utilizar o python 3.7+
+3. Instalar o Flask
 ````
  pip3 install flask==0.12.2
 ````
-3. Executar a aplicação pelo arquivo ``jogoteca.py``
+4. Executar a aplicação pelo arquivo ``jogoteca.py``
 
 ## Desenvolvimento futuro
 
