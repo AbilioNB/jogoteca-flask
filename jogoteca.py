@@ -1,38 +1,39 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for
-
+from dao import JogoDao
+from dao import UsuarioDao
+from flask_mysqldb import MySQL
+from models import Jogo, Usuario
 app = Flask(__name__)
 #Definindo chave para conseguir armazenar sessao
 app.secret_key = 'alura'
+app.config['MYSQL_HOST'] = "127.0.0.1"
+app.config['MYSQL_USER'] = "root"
+app.config['MYSQL_PASSWORD'] = "root"
+app.config['MYSQL_DB'] = "jogoteca"
+app.config['MYSQL_PORT'] = 3306
 
-class Jogo:
-    def __init__(self,nome,categoria,console):
-        self.nome = nome
-        self.categoria = categoria
-        self.console = console
-
-class Usuario:
-    def __init__(self,id,nome,senha):
-        self.id = id
-        self.nome = nome
-        self.senha = senha
+db = MySQL(app)
+jogo_dao  = JogoDao(db)
+usuario_dao = UsuarioDao(db)
 
 
 
-user1 =Usuario('abilionb', 'Abilio Nogueira', '1234')
-user2 =Usuario('rmelo', 'Renata Melo', '5678')
-user3 =Usuario('Tuser', 'Usuario Teste', 'abcd')
+#user1 =Usuario('abilionb', 'Abilio Nogueira', '1234')
+#user2 =Usuario('rmelo', 'Renata Melo', '5678')
+#user3 =Usuario('Tuser', 'Usuario Teste', 'abcd')
 
-users = {user1.id: user1,
-         user2.id: user2,
-         user3.id: user3}
+#users = {user1.id: user1,
+         #user2.id: user2,
+         #user3.id: user3}
 
-jogo1 = Jogo('Super Mario', 'Acao', 'SNES')
-jogo2 = Jogo('Pokemon Gold', 'RPG', 'GBA')
-lista = [jogo1, jogo2]
+#jogo1 = Jogo('Super Mario', 'Acao', 'SNES')
+#jogo2 = Jogo('Pokemon Gold', 'RPG', 'GBA')
+#lista = [jogo1, jogo2]
 
 
 @app.route('/')
 def index():
+    lista = jogo_dao.listar()
     return render_template('lista.html', titulo ='Jogos', jogos = lista)
 
 
@@ -49,7 +50,8 @@ def adicionar():
     categoria = request.form['categoria']
     console = request.form['console']
     jogo = Jogo(nome, categoria, console)
-    lista.append(jogo)
+    #lista.append(jogo)
+    jogo_dao.salvar(jogo)
     return redirect(url_for('index'))
 
 
@@ -62,8 +64,8 @@ def login():
 
 @app.route('/autenticar', methods=['POST',])
 def autenticar():
-    if request.form['usuario'] in users:
-        usuario = users[request.form['usuario']]
+    usuario = usuario_dao.buscar_por_id(request.form['usuario'])
+    if usuario:
         if usuario.senha == request.form['senha']:
             session['usuario_logado'] = usuario.id
             flash(usuario.nome + ' logou com sucesso!')
