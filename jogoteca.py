@@ -17,20 +17,6 @@ jogo_dao  = JogoDao(db)
 usuario_dao = UsuarioDao(db)
 
 
-
-#user1 =Usuario('abilionb', 'Abilio Nogueira', '1234')
-#user2 =Usuario('rmelo', 'Renata Melo', '5678')
-#user3 =Usuario('Tuser', 'Usuario Teste', 'abcd')
-
-#users = {user1.id: user1,
-         #user2.id: user2,
-         #user3.id: user3}
-
-#jogo1 = Jogo('Super Mario', 'Acao', 'SNES')
-#jogo2 = Jogo('Pokemon Gold', 'RPG', 'GBA')
-#lista = [jogo1, jogo2]
-
-
 @app.route('/')
 def index():
     lista = jogo_dao.listar()
@@ -50,7 +36,6 @@ def adicionar():
     categoria = request.form['categoria']
     console = request.form['console']
     jogo = Jogo(nome, categoria, console)
-    #lista.append(jogo)
     jogo_dao.salvar(jogo)
     return redirect(url_for('index'))
 
@@ -75,6 +60,22 @@ def autenticar():
         flash('Não logado, tente de novo!')
         return redirect(url_for('login'))
 
+@app.route('/editar/<int:id>')
+def editar(id):
+    if 'usuario_logado' not in session or session ['usuario_logado'] == None:
+        return  redirect(url_for('login', proxima = url_for('editar')))
+    jogo_alterar  = jogo_dao.busca_por_id(id)
+    return render_template('editar.html', titulo='Editando Game', jogo = jogo_alterar )
+
+
+@app.route('/atualizar', methods=['POST', ])
+def atualizar():
+    nome = request.form['nome']
+    categoria = request.form['categoria']
+    console = request.form['console']
+    jogo = Jogo(nome, categoria, console, id = request.form['id'])
+    jogo_dao.salvar(jogo)
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():

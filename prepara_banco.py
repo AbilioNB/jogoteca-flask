@@ -3,8 +3,8 @@ print('Conectando...')
 conn = MySQLdb.connect(user='root', passwd='root', host='127.0.0.1', port=3306)
 
 # Descomente se quiser desfazer o banco...
-#conn.cursor().execute("DROP DATABASE `jogoteca`;")
-#conn.commit()
+conn.cursor().execute("DROP DATABASE `jogoteca`;")
+conn.commit()
 
 criar_tabelas = '''SET NAMES utf8;
     CREATE DATABASE `jogoteca` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
@@ -30,9 +30,9 @@ cursor = conn.cursor()
 cursor.executemany(
       'INSERT INTO jogoteca.usuario (id, nome, senha) VALUES (%s, %s, %s)',
       [
-            ('luan', 'Luan Marques', 'flask'),
-            ('nico', 'Nico', '7a1'),
-            ('danilo', 'Danilo', 'vegas')
+            ('abilionb', 'Abilio Nogueira', '1234'),
+            ('rmelo', 'Renata Melo', '5678'),
+            ('Tuser', 'Usuario Teste', 'abcd')
       ])
 
 cursor.execute('select * from jogoteca.usuario')
