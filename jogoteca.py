@@ -83,6 +83,13 @@ def logout():
     flash('Nenhum usuário logado!')
     return redirect(url_for('index'))
 
+@app.route('/deletar/<int:id>')
+def deletar(id):
+    jogo_dao.deletar(id)
+    flash("Jogo removido")
+    return redirect(url_for('index'))
+
+
 
 app.run(debug=True)
 # app.run(host='0.0.0.0', port=8080) alternativa para configurar a porta e o host do metodo run
