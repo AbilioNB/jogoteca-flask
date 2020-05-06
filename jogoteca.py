@@ -1,95 +1,18 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
-from dao import JogoDao
-from dao import UsuarioDao
+from flask import Flask, render_template, request, redirect, session, flash, url_for,send_from_directory
 from flask_mysqldb import MySQL
-from models import Jogo, Usuario
+
+
 app = Flask(__name__)
 #Definindo chave para conseguir armazenar sessao
-app.secret_key = 'alura'
-app.config['MYSQL_HOST'] = "127.0.0.1"
-app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "root"
-app.config['MYSQL_DB'] = "jogoteca"
-app.config['MYSQL_PORT'] = 3306
+app.config.from_pyfile('config.py')
 
 db = MySQL(app)
-jogo_dao  = JogoDao(db)
-usuario_dao = UsuarioDao(db)
 
-
-@app.route('/')
-def index():
-    lista = jogo_dao.listar()
-    return render_template('lista.html', titulo ='Jogos', jogos = lista)
-
-
-@app.route('/novo')
-def novo():
-    if 'usuario_logado' not in session or session ['usuario_logado'] == None:
-        return  redirect(url_for('login', proxima = url_for('novo')))
-    return render_template('novo.html', titulo='Adicionar Game')
-
-
-@app.route('/criar', methods=['POST',])
-def adicionar():
-    nome = request.form['nome']
-    categoria = request.form['categoria']
-    console = request.form['console']
-    jogo = Jogo(nome, categoria, console)
-    jogo_dao.salvar(jogo)
-    return redirect(url_for('index'))
-
-
-@app.route('/login')
-def login():
-    #Realizando um query para buscar a proxima pagina pos login
-    proxima = request.args.get('proxima')
-    return render_template('login.html',proxima = proxima)
-
-
-@app.route('/autenticar', methods=['POST',])
-def autenticar():
-    usuario = usuario_dao.buscar_por_id(request.form['usuario'])
-    if usuario:
-        if usuario.senha == request.form['senha']:
-            session['usuario_logado'] = usuario.id
-            flash(usuario.nome + ' logou com sucesso!')
-            proxima_pagina = request.form['proxima']
-            return redirect(proxima_pagina)
-    else:
-        flash('Não logado, tente de novo!')
-        return redirect(url_for('login'))
-
-@app.route('/editar/<int:id>')
-def editar(id):
-    if 'usuario_logado' not in session or session ['usuario_logado'] == None:
-        return  redirect(url_for('login', proxima = url_for('editar')))
-    jogo_alterar  = jogo_dao.busca_por_id(id)
-    return render_template('editar.html', titulo='Editando Game', jogo = jogo_alterar )
-
-
-@app.route('/atualizar', methods=['POST', ])
-def atualizar():
-    nome = request.form['nome']
-    categoria = request.form['categoria']
-    console = request.form['console']
-    jogo = Jogo(nome, categoria, console, id = request.form['id'])
-    jogo_dao.salvar(jogo)
-    return redirect(url_for('index'))
-
-@app.route('/logout')
-def logout():
-    session['usuario_logado'] = None
-    flash('Nenhum usuário logado!')
-    return redirect(url_for('index'))
-
-@app.route('/deletar/<int:id>')
-def deletar(id):
-    jogo_dao.deletar(id)
-    flash("Jogo removido")
-    return redirect(url_for('index'))
+from views import *
 
 
 
-app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 # app.run(host='0.0.0.0', port=8080) alternativa para configurar a porta e o host do metodo run
